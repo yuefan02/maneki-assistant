@@ -796,3 +796,18 @@
 [ws_daemon] 收盘(1500), 休眠 66.4h 到 09-07 09:25
 2026-09-04 16:01:52 - websocket_client - ERROR - Connection to remote host was lost.
 2026-09-04 16:01:52 - websocket - ERROR - Connection to remote host was lost. - goodbye
+[jvQuant WS] 连接已断开，重新连接...
+[jvQuant WS] 已连接
+[ws_daemon] 重连后恢复 L1 订阅 14 只
+[ws_daemon] 重连后恢复 L2 订阅 14 只
+[jvQuant WS] 飞书报警已发送: 52.2元
+[ws_daemon] L1新增订阅 226 只
+2026-09-07 12:01:52 - websocket_client - ERROR - Connection to remote host was lost.
+2026-09-07 12:01:52 - websocket - ERROR - Connection to remote host was lost. - goodbye
+[jvQuant WS] 连接已断开，重新连接...
+[jvQuant WS] 已连接
+[ws_daemon] 重连后恢复 L1 订阅 230 只
+[ws_daemon] 重连后恢复 L2 订阅 230 只
+[ws_daemon] 收盘(1500), 休眠 18.4h 到 09-08 09:25
+2026-09-07 16:01:52 - websocket_client - ERROR - Connection to remote host was lost.
+2026-09-07 16:01:52 - websocket - ERROR - Connection to remote host was lost. - goodbye
