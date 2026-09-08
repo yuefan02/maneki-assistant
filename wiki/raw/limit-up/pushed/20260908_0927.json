@@ -1,0 +1,50 @@
+[
+  {
+    "code": "000798.SZ",
+    "name": "中水渔业",
+    "model_score": 81.16999816894531,
+    "total_score": 81.16999816894531,
+    "score_mode": "model_score",
+    "pct_chg": 7.26,
+    "scores": {
+      "technical": 37.0,
+      "fundflow": 36.0,
+      "sentiment": 78.0,
+      "shortterm": 15.0,
+      "fundamental": 30.0
+    },
+    "fundamental": 30.0
+  },
+  {
+    "code": "002579.SZ",
+    "name": "中京电子",
+    "model_score": 59.029998779296875,
+    "total_score": 59.029998779296875,
+    "score_mode": "model_score",
+    "pct_chg": 8.96,
+    "scores": {
+      "technical": 44.0,
+      "fundflow": 53.0,
+      "sentiment": 100.0,
+      "shortterm": 15.0,
+      "fundamental": 38.0
+    },
+    "fundamental": 38.0
+  },
+  {
+    "code": "605577.SH",
+    "name": "龙版传媒",
+    "model_score": 58.93000030517578,
+    "total_score": 58.93000030517578,
+    "score_mode": "model_score",
+    "pct_chg": 6.25,
+    "scores": {
+      "technical": 43.0,
+      "fundflow": 26.0,
+      "sentiment": 99.0,
+      "shortterm": 15.0,
+      "fundamental": 29.0
+    },
+    "fundamental": 29.0
+  }
+]
