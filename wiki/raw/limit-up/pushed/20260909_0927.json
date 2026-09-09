@@ -1,0 +1,50 @@
+[
+  {
+    "code": "603938.SH",
+    "name": "三孚股份",
+    "model_score": 76.94000244140625,
+    "total_score": 76.94000244140625,
+    "score_mode": "model_score",
+    "pct_chg": 5.49,
+    "scores": {
+      "technical": 15.0,
+      "fundflow": 21.0,
+      "sentiment": 100.0,
+      "shortterm": 15.0,
+      "fundamental": 58.0
+    },
+    "fundamental": 58.0
+  },
+  {
+    "code": "605577.SH",
+    "name": "龙版传媒",
+    "model_score": 72.54000091552734,
+    "total_score": 72.54000091552734,
+    "score_mode": "model_score",
+    "pct_chg": null,
+    "scores": {
+      "technical": 61.0,
+      "fundflow": 53.0,
+      "sentiment": 95.0,
+      "shortterm": 10.0,
+      "fundamental": 29.0
+    },
+    "fundamental": 29.0
+  },
+  {
+    "code": "000759.SZ",
+    "name": "中百集团",
+    "model_score": 68.0999984741211,
+    "total_score": 68.0999984741211,
+    "score_mode": "model_score",
+    "pct_chg": 8.44,
+    "scores": {
+      "technical": 40.0,
+      "fundflow": 55.0,
+      "sentiment": 94.0,
+      "shortterm": 15.0,
+      "fundamental": 48.0
+    },
+    "fundamental": 48.0
+  }
+]

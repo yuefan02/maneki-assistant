@@ -40,6 +40,11 @@ from plays.watchdog.confirm import (STAND_TOL, check_buy_confirm,
                                      fund_accumulate_confirm, FA_N)
 from scripts.tu_share import call_tushare  # noqa: E402
 
+# 模块级加载 .env（模块级常量依赖 env，原 load_dotenv 在 main() 内晚于常量定义）
+_env_file = PROJECT_DIR / ".env"
+if _env_file.exists():
+    load_dotenv(_env_file, override=False)
+
 # WS 数据通过 ws_daemon 共享内存读取
 SHM_DIR = Path("/dev/shm")
 WS_SUB = SHM_DIR / "ws_sub.json"
@@ -101,6 +106,10 @@ PAUSE_BUY = int(os.getenv("WATCHDOG_PAUSE_BUY", "0"))
 # 100 股持仓走 -2 降档逻辑（L936-940）。
 SELL_VOL = int(os.getenv("WATCHDOG_SELL_VOL", "200"))
 ABNORMAL_COOLDOWN_SECONDS = 300  # 异常推送冷却：同一 level 5 分钟内不重复推送
+# 2026-09-09 用户拍板：暂停真实交易转模拟（PAPER_TRADING=1 时不发真单）。
+# 配合 scripts/jvquant_trade_client.py 的 PAPER_TRADING：buy/sale 假设成交，
+# 交割单写 {date}.paper.json（不污染真实 {date}.json），推送加【模拟】标记。
+PAPER_TRADING = int(os.getenv("PAPER_TRADING", "0"))
 
 # 候选池来源：limit_up pipeline 产出的 analysis
 ANALYSIS_DIRS = [
@@ -113,6 +122,8 @@ ANALYSIS_DIRS = [
 
 def _push_feishu(text: str):
     """推送盯盘信号到飞书"""
+    if PAPER_TRADING:
+        text = f"🧪【模拟】{text}"
     try:
         env_file = PROJECT_DIR / ".env"
         if env_file.exists():
@@ -162,7 +173,12 @@ def _log_trade_journal(code: str, name: str, direction: str, price: float,
         today = datetime.now().strftime("%Y%m%d")
         report_dir = PROJECT_DIR / "plays" / "trading" / "data" / "reports"
         report_dir.mkdir(parents=True, exist_ok=True)
-        report_file = report_dir / f"{today}.json"
+        # 2026-09-09 模拟模式：写独立 .paper.json，不污染真实交割单
+        #（18:00 复盘 / compile 读 {date}.json 算真实盈亏）。
+        if PAPER_TRADING:
+            report_file = report_dir / f"{today}.paper.json"
+        else:
+            report_file = report_dir / f"{today}.json"
 
         if direction == "买入":
             pnl, pnl_pct = 0.0, 0.0
@@ -178,6 +194,7 @@ def _log_trade_journal(code: str, name: str, direction: str, price: float,
             "code": code, "name": name, "direction": direction,
             "price": price, "shares": shares, "amount": amount,
             "time": t, "reason": reason, "pnl": pnl, "pnl_pct": pnl_pct,
+            "paper": True if PAPER_TRADING else False,
         }
 
         existing = []

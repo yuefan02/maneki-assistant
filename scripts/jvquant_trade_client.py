@@ -46,6 +46,78 @@ env_file = PROJECT_DIR / ".env"
 if env_file.exists():
     load_dotenv(env_file, override=False)
 
+# ── 模拟交易开关（PAPER_TRADING=1 时不发真单，假设成交）──
+# 用户 2026-09-09 拍板：暂停真实交易转模拟，系统不再碰真实 CTP 账户。
+# 开启后 buy/sale/cancel/check_order/check_hold 全部返回模拟数据，
+# watchdog 的成交确认链（code=0 → check_order 已成）完整走通但不发真单。
+PAPER_TRADING = os.getenv("PAPER_TRADING", "0") == "1"
+
+
+class _PaperClient:
+    """模拟交易客户端：所有下单假设成交，绝不连 CTP 发真单。
+
+    维护一个进程内委托列表供 check_order 返回（status 恒"已成"），
+    check_hold 返回虚拟资金 + 空持仓（watchdog 的 state.json 才是
+    模拟持仓账本，这里只保证"不拦截 + 不真下单"）。
+    """
+
+    def __init__(self):
+        self._orders: list[dict] = []
+        self._seq = 0
+
+    def _next_oid(self) -> str:
+        self._seq += 1
+        return f"PAPER{int(time.time())}{self._seq}"
+
+    def _record(self, code, otype, price, vol) -> str:
+        oid = self._next_oid()
+        short = (code or "").replace(".SH", "").replace(".SZ", "").replace(".BJ", "")
+        self._orders.append({
+            "order_id": oid,
+            "code": short,
+            "type": otype,
+            "status": "已成",
+            "deal_volume": str(vol or 100),
+            "order_price": str(price or 0),
+        })
+        return oid
+
+    def buy(self, code=None, name=None, price=None, vol=None, **kw) -> dict:
+        oid = self._record(code, "证券买入", price, vol or 100)
+        return {"code": "0", "order_id": oid,
+                "message": f"模拟买入成交 {code} {name}"}
+
+    def sale(self, code=None, name=None, price=None, vol=None, **kw) -> dict:
+        oid = self._record(code, "证券卖出", price, vol or 100)
+        return {"code": "0", "order_id": oid,
+                "message": f"模拟卖出成交 {code} {name}"}
+
+    def cancel(self, order_id=None, **kw) -> dict:
+        return {"code": "0", "message": "模拟撤单成功"}
+
+    def check_order(self, **kw) -> dict:
+        return {"list": list(self._orders)}
+
+    def check_hold(self, **kw) -> dict:
+        # 虚拟资金设大额，避免 watchdog 三重风控的 MIN_FREE_CASH 拦截；
+        # hold_list 空 → _reconcile_holds 不动作（模拟持仓由 state.json 管理）
+        return {"total": "1000000.00", "usable": "1000000.00",
+                "hold_list": [], "day_earn": "0", "hold_earn": "0"}
+
+    def login(self, **kw) -> dict:
+        return {"code": "0"}
+
+
+_paper_client = None
+
+
+def _get_paper_client():
+    global _paper_client
+    if _paper_client is None:
+        _paper_client = _PaperClient()
+    return _paper_client
+
+
 # ── 密码安全读取 ──
 
 _CTP_PWD_FILE = Path.home() / ".ctp_pwd"
@@ -102,6 +174,8 @@ _client = None
 def get_trade_client(log_level=logging.WARNING):
     """获取 CTP 交易客户端（单例，auto_relogin=True）"""
     global _client
+    if PAPER_TRADING:
+        return _get_paper_client()
     if _client is not None:
         return _client
 
@@ -196,6 +270,8 @@ def buy(code: str, name: str, price: float | str = None, vol: int | str = 100) -
     price=None 时从10档算最优价。
     登录失效自动调 login() 重试一次。
     """
+    if PAPER_TRADING:
+        return _get_paper_client().buy(code=code, name=name, price=price, vol=vol)
     vol_i = int(vol)
     # 自动定价
     if price is None:
@@ -281,6 +357,8 @@ def sale(code: str, name: str, price: float | str = None, vol: int | str = 100) 
     price=None 时从10档算最优价。
     登录失效自动调 login() 重试一次。
     """
+    if PAPER_TRADING:
+        return _get_paper_client().sale(code=code, name=name, price=price, vol=vol)
     vol_i = int(vol)
     # 自动定价
     if price is None:
@@ -341,16 +419,22 @@ def sale(code: str, name: str, price: float | str = None, vol: int | str = 100) 
 
 
 def cancel(order_id: str) -> dict:
+    if PAPER_TRADING:
+        return _get_paper_client().cancel(order_id=order_id)
     client = get_trade_client()
     return client.cancel(order_id=order_id)
 
 
 def check_order() -> dict:
+    if PAPER_TRADING:
+        return _get_paper_client().check_order()
     client = get_trade_client()
     return client.check_order()
 
 
 def check_hold() -> dict:
+    if PAPER_TRADING:
+        return _get_paper_client().check_hold()
     client = get_trade_client()
     r = _get_hold(client)
     return r
