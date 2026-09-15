@@ -1,0 +1,50 @@
+[
+  {
+    "code": "000978.SZ",
+    "name": "桂林旅游",
+    "model_score": 74.72000122070312,
+    "total_score": 74.72000122070312,
+    "score_mode": "model_score",
+    "pct_chg": 6.45,
+    "scores": {
+      "technical": 61.0,
+      "fundflow": 63.0,
+      "sentiment": 52.0,
+      "shortterm": 10.0,
+      "fundamental": 38.0
+    },
+    "fundamental": 38.0
+  },
+  {
+    "code": "000981.SZ",
+    "name": "山子高科",
+    "model_score": 71.06999969482422,
+    "total_score": 71.06999969482422,
+    "score_mode": "model_score",
+    "pct_chg": 8.77,
+    "scores": {
+      "technical": 25.0,
+      "fundflow": 21.0,
+      "sentiment": 100.0,
+      "shortterm": 20.0,
+      "fundamental": 40.0
+    },
+    "fundamental": 40.0
+  },
+  {
+    "code": "605580.SH",
+    "name": "恒盛能源",
+    "model_score": 58.08000183105469,
+    "total_score": 58.08000183105469,
+    "score_mode": "model_score",
+    "pct_chg": 5.89,
+    "scores": {
+      "technical": 26.0,
+      "fundflow": 29.0,
+      "sentiment": 86.0,
+      "shortterm": 10.0,
+      "fundamental": 50.0
+    },
+    "fundamental": 50.0
+  }
+]
